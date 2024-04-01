@@ -1,0 +1,61 @@
+version: "3.5"
+
+volumes:
+  rpc_prometheus_data: {}
+  rpc_alerta_db: {}
+
+networks:
+  rpc_monitoring:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rpc_prometheus
+    volumes:
+       - type: volume
+         source: rpc_prometheus_data
+         target: /prometheus
+       - type: bind
+         source: ./prometheus
+         target: /etc/prometheus
+         read_only: true 
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+    networks:
+      - rpc_monitoring
+    restart: always
+
+  rpc_exporter:
+    build: .
+    container_name: rpc_exporter
+    ports:
+      - "9300:9300"
+    restart: always
+    environment:
+      - FLASK_DEBUG=true
+    networks:
+      - rpc_monitoring
+    entrypoint: ["/usr/bin/oracle-exporter", "--node", "${NIBIRU_GRPC}"]
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: rpc_alertmanager
+    networks:
+      - rpc_monitoring
+    ports:
+      - "9093:9093"
+    volumes:
+      - type: bind
+        source: ./prometheus/alert_manager
+        target: /etc/alertmanager
+        read_only: true
+    command: [
+      '--config.file=/etc/alertmanager/alertmanager.yml',
+      '--log.level=debug',
+    ]
+    hostname: 'alertmanager'
+    restart: always

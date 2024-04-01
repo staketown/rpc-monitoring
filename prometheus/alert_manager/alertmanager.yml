@@ -1,0 +1,23 @@
+global:
+  resolve_timeout: 1m
+
+templates: 
+- 'templates/*'
+
+route:
+  group_by: ['...']
+  group_wait: 1m
+  group_interval: 5m
+  repeat_interval: 1h
+  
+  routes:
+    - receiver: 'rpc-monitoring'
+      group_by: ['...']
+
+  receiver: rpc-monitoring
+
+receivers:
+- name: 'rpc-monitoring'
+  webhook_configs:
+  - send_resolved: true
+    url: 'http://rpc-alertmanager-bot:8080'
