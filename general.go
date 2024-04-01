@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var ()
-
 func GeneralHandler(w http.ResponseWriter, r *http.Request) {
 	requestStart := time.Now()
 
@@ -77,9 +75,10 @@ func GeneralHandler(w http.ResponseWriter, r *http.Request) {
 			"error":    err.Error(),
 		}).Set(0)
 	} else {
-		// caught up by default
+		// not synced bt default
 		var catchUp float64 = 1
 		if !data.Result.SyncInfo.CatchingUp {
+			// synced
 			catchUp = 0
 		}
 

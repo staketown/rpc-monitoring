@@ -1,7 +1,7 @@
 global:
   scrape_interval: 1m
   scrape_timeout: 20s
-  evaluation_interval: 30s
+  evaluation_interval: 10s
 
 alerting:
   alertmanagers:
@@ -10,7 +10,7 @@ alerting:
       timeout: 20s
       api_version: v2
       static_configs:
-        - targets: [rpc-alertmanager:9093]
+        - targets: [rpc_alertmanager:9093]
 
 rule_files:
   - /etc/prometheus/alerts/rules.yaml
@@ -21,14 +21,18 @@ scrape_configs:
     static_configs:
       - targets: [localhost:9090]
 
-  - job_name: oracle
+  - job_name: rpc
     metrics_path: /metrics/general
     relabel_configs:
       - source_labels:
           - rpc
-        target_label: __param_valoper
+        target_label: __param_rpc
     static_configs:
       - targets:
-          - rpc-exporter:9300
+          - rpc_exporter:9300
         labels:
-          rpc: http://localhost:27657
+          rpc: "http://localhost:27657"
+      - targets:
+          - rpc_exporter:9300
+        labels:
+          rpc: "http://localhost:28657"

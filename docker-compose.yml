@@ -1,8 +1,7 @@
-version: "3.5"
+version: "3.9"
 
 volumes:
   rpc_prometheus_data: {}
-  rpc_alerta_db: {}
 
 networks:
   rpc_monitoring:
@@ -24,7 +23,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-lifecycle'
     ports:
-      - 9090:9090
+      - "9690:9090"
     networks:
       - rpc_monitoring
     restart: always
@@ -33,13 +32,13 @@ services:
     build: .
     container_name: rpc_exporter
     ports:
-      - "9300:9300"
+      - "9600:9300"
     restart: always
     environment:
       - FLASK_DEBUG=true
     networks:
       - rpc_monitoring
-    entrypoint: ["/usr/bin/oracle-exporter", "--node", "${NIBIRU_GRPC}"]
+    entrypoint: ["/usr/bin/rpc_exporter"]
 
   alertmanager:
     image: prom/alertmanager:latest
@@ -47,7 +46,7 @@ services:
     networks:
       - rpc_monitoring
     ports:
-      - "9093:9093"
+      - "9693:9093"
     volumes:
       - type: bind
         source: ./prometheus/alert_manager

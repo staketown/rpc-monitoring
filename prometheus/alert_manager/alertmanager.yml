@@ -11,13 +11,14 @@ route:
   repeat_interval: 1h
   
   routes:
-    - receiver: 'rpc-monitoring'
+    - receiver: 'discord'
       group_by: ['...']
 
-  receiver: rpc-monitoring
+  receiver: discord
 
 receivers:
-- name: 'rpc-monitoring'
-  webhook_configs:
-  - send_resolved: true
-    url: 'http://rpc-alertmanager-bot:8080'
+  - name: discord
+    discord_configs:
+      - webhook_url: YOUR_WEBHOOK_HERE
+        title: '{{ template "discord.title" . }}'
+        message: '{{ template "discord.message" . }}'

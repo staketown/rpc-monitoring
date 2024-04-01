@@ -1,4 +1,4 @@
-FROM golang:1.20 AS exporter
+FROM golang:1.22 AS exporter
 
 ENV GOBIN=/go/bin
 ENV GOPATH=/go
@@ -12,6 +12,7 @@ RUN go build -o /rpc_exporter .
 FROM debian:buster-slim
 
 RUN useradd -ms /bin/bash exporter && chown -R exporter /usr
+RUN apt-get update && apt-get install -y ca-certificates
 
 EXPOSE 9300
 
